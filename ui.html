@@ -1,44 +1,51 @@
 <script>
-	window.onmessage = async (event) => {
-		if (event.data.pluginMessage.type === 'networkRequest') {
-			const randomPage = Math.round(Math.random() * 100)
+  window.onmessage = async (event) => {
+    if (event.data.pluginMessage.type === "networkRequest") {
+      const randomPage = Math.round(Math.random() * 100);
 
-			// Get a random quote from the Design Quotes API
-			const res = await fetch(`https://quotesondesign.com/wp-json/wp/v2/posts/?orderby=rand&per_page=1&page=${randomPage}&_fields=title,yoast_head_json`)
-			const data = await res.json()
+      // Get a random quote from the Design Quotes API
+      const res = await fetch(
+        `https://quotesondesign.com/wp-json/wp/v2/posts/?orderby=rand&per_page=1&page=${randomPage}&_fields=title,yoast_head_json`
+      );
+      const data = await res.json();
 
-			// Get author name from response
-			const authorName = data[0].title.rendered
+      // Get author name from response
+      const authorName = data[0].title.rendered;
 
-			// Get quote content from response and format it
-			let quoteContent = data[0].yoast_head_json.og_description
-			quoteContent = decodeEntities(quoteContent)
+      // Get quote content from response and format it
+      let quoteContent = data[0].yoast_head_json.og_description;
+      quoteContent = decodeEntities(quoteContent);
 
-			window.parent.postMessage({pluginMessage: {
-				authorName,
-				quoteContent
-			}}, '*')
-		}
-	}
+      window.parent.postMessage(
+        {
+          pluginMessage: {
+            authorName,
+            quoteContent,
+          },
+        },
+        "*"
+      );
+    }
+  };
 
-	// https://stackoverflow.com/a/9609450
-	var decodeEntities = (function() {
-	  // this prevents any overhead from creating the object each time
-	  var element = document.createElement('div');
+  // https://stackoverflow.com/a/9609450
+  var decodeEntities = (function () {
+    // this prevents any overhead from creating the object each time
+    var element = document.createElement("div");
 
-	  function decodeHTMLEntities (str) {
-	    if(str && typeof str === 'string') {
-	      // strip script/html tags
-	      str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
-	      str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
-	      element.innerHTML = str;
-	      str = element.textContent;
-	      element.textContent = '';
-	    }
+    function decodeHTMLEntities(str) {
+      if (str && typeof str === "string") {
+        // strip script/html tags
+        str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gim, "");
+        str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gim, "");
+        element.innerHTML = str;
+        str = element.textContent;
+        element.textContent = "";
+      }
 
-	    return str;
-	  }
+      return str;
+    }
 
-	  return decodeHTMLEntities;
-	})();
+    return decodeHTMLEntities;
+  })();
 </script>
